@@ -1,13 +1,17 @@
 CREATE DATABASE cinema_booking_system;
 
-USE cinema_booking_system;
+uSE cinema_booking_system;
 
-CREATE TABLE films(
+CREATE TABLE IF NOT EXISTS  films(
 	film_id INT Primary KEY AUTO_INCREMENT,
 	name VARCHAR(45) NOT NULL UNIQUE,
 	length_min INT NOT NULL
+
 );
-show tables;
+
+alter table films
+add     check(length_min >=60);
+
 CREATE TABLE customers (
 	customer_id INT PRIMARY KEY AUTO_INCREMENT,
 	first_name VARCHAR(45),
@@ -15,12 +19,15 @@ CREATE TABLE customers (
 	email VARCHAR(45) NOT NULL UNIQUE
 );
 
+select * from customers;
+
+select * from rooms;
 CREATE TABLE rooms(
 	room_id INT PRIMARY KEY AUTO_INCREMENT,
     room_name VARCHAR(45) NOT NULL,
     no_seats INT NOT NULL
 );
-
+delete from customers;
 CREATE TABLE screenings (
 	screening_id INT PRIMARY KEY AUTO_INCREMENT,
     film_id INT NOT NULL,
@@ -29,7 +36,7 @@ CREATE TABLE screenings (
     FOREIGN KEY (film_id) REFERENCES films (film_id),
     FOREIGN KEY (room_id) REFERENCES rooms (room_id)
     );
-drop table screenings;
+select * from screenings;
 
 CREATE TABLE seats (
 	seat_id INT PRIMARY KEY AUTO_INCREMENT,
@@ -44,8 +51,9 @@ CREATE TABLE bookings (
     screening_id INT NOT NULL,
     customer_id INT NOT NULL,
     FOREIGN KEY (screening_id) REFERENCES screenings(screening_id),
-    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+   FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
     );
+    
     describe bookings;
     
 CREATE TABLE reserved_seat (
@@ -56,34 +64,31 @@ CREATE TABLE reserved_seat (
     FOREIGN KEY (seat_id) REFERENCES seats (seat_id)
     );
     
-    describe reserved_seat;
+# count the number of screenings for "The Upside" in October 17
 
-INSERT INTO films (name, length_min)
-VALUES ('Blade Runner 2049',153),
-('Dunkirk',106),
-('Geostorm',121),
-('Thor: Ragnarok',107),
-('Jigsaw',116),
-('The Death of Stalin',98),
-('The Lego Ninjago Movie',101),
-('Murder on the Orient Express',135),
-('Paddington 2',88),
-('Breathe',117),
-('Blade Runner',127),
-('Victoria and Abdul',112);
-    
-SELECT * FROM films;
+SELECT COUNT(*) FROM screenings s
+JOIN films f ON s.film_id = f.film_id
+WHERE f.NAME = 'The Upside';
+
+
+SELECT COUNT(*) FROM bookings
+WHERE customer_id = 10;
+
+    SELECT * FROM films;
 SELECT * FROM customers;
 SELECT * FROM rooms;
 SELECT * FROM screenings;
 SELECT * FROM seats;
 SELECT * FROM bookings;
 SELECT * FROM reserved_seat;
-INSERT INTO rooms (room_name, no_seats) 
-VALUES ('Chaplin',72),
-('Kubrick',36),
-('Coppola',36);
+# Count the number of unique customers who made a booking for October 2018
+
+Select f.name, s.start_time, c.first_name, c.last_name, count(b.booking_id) from films f
+join screenings s on f.film_id = s.film_id
+join bookings b on s.screening_id = b.screening_id
+join customers c on b.customer_id = c.customer_id
+group by f.name, c.last_name, c.first_name, s.start_time
+order by s.start_time;
     
-    
-    
-    
+    describe reserved_seat;
+select * from films into outfile"//Users//mariocatzin/COMP4910//fims.csc "fields terminated by ',' terminated by'\n';
